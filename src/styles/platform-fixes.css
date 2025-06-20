@@ -1,0 +1,26 @@
+/* Platform-specific fixes */
+
+/* This file previously contained CSS to hide scanner-related UI on iOS/mobile devices.
+   Now that we've implemented proper component separation with:
+   - IOSFileUploadSection.tsx (for iOS)
+   - FileUploadSection.tsx (for desktop)
+   
+   Most of those CSS rules are no longer needed. We're handling platform differences
+   directly in the component structure rather than through CSS.
+*/
+
+/* We'll keep this file as a placeholder for future platform-specific CSS fixes that
+   can't be handled through component separation. */
+
+/* Mobile-specific styling fixes */
+@media (max-width: 767px) {
+  /* Fix dropdown menu positioning on mobile */
+  .mobile-dropdown-menu {
+    position: absolute !important;
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
+    min-width: 10rem !important;
+    z-index: 9999 !important;
+  }
+}

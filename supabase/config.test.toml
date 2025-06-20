@@ -1,0 +1,13 @@
+project_id = "qospdugsqnkrzomiczgc"
+[api]
+enabled = true
+port = 54321
+
+[functions.send-reminder-emails]
+verify_jwt = true
+
+[functions.send-feedback]
+verify_jwt = true
+
+[functions.send-contact-email]
+verify_jwt = true

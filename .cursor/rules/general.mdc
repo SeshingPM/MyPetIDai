@@ -1,0 +1,21 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+---
+Description: General Guidelines 
+---
+
+#general coding guidelines
+- Prioritize readability and maintainability.
+- Use clear, descriptive names.
+- Add meaningful comments for complex logic.
+
+
+
+
+
+
+
+

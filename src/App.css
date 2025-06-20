@@ -1,0 +1,140 @@
+
+/* We're standardizing on Tailwind utility classes for styling */
+/* This file is kept minimal to avoid conflicts */
+
+/* Root element styling */
+#root {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Add enhanced animation for floating elements with reduced intensity for mobile */
+@keyframes float-advanced {
+  0% {
+    transform: translateY(0) rotate(0);
+  }
+  50% {
+    transform: translateY(-10px) rotate(5deg);
+  }
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+}
+
+@keyframes float-mobile {
+  0% {
+    transform: translateY(0) rotate(0);
+  }
+  50% {
+    transform: translateY(-5px) rotate(2deg);
+  }
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+}
+
+.animate-float {
+  animation: float-advanced 6s ease-in-out infinite;
+}
+
+/* Add subtle pulse animation with reduced complexity for mobile */
+@keyframes pulse-soft {
+  0% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 0.7;
+  }
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 6s ease-in-out infinite;
+}
+
+/* Fade in animation for improved perceived performance */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out forwards;
+}
+
+/* Hide scrollbars while maintaining scroll functionality */
+.scrollbar-none {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
+
+/* Mobile-specific enhancements */
+@media (max-width: 640px) {
+  /* Reduce glass effect complexity on mobile */
+  .glass-panel {
+    border-width: 1px;
+    background-color: rgba(255, 255, 255, 0.98);
+  }
+  
+  /* Optimize animations for mobile */
+  .animate-pulse-soft {
+    animation-duration: 4s;
+    animation: none; /* Disable on low-end devices */
+  }
+  
+  .animate-float {
+    animation: float-mobile 4s ease-in-out infinite;
+  }
+  
+  /* Reduce or eliminate shadows on mobile for better performance */
+  .shadow-xl, .shadow-lg {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+  
+  /* Reduce blur radius for better performance */
+  .blur-3xl {
+    filter: blur(20px);
+  }
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  .animate-float,
+  .animate-pulse-soft,
+  .animate-pulse,
+  .animate-fade-in {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Print styles for better document printing */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  
+  .print-break-after {
+    page-break-after: always;
+  }
+}

@@ -1,0 +1,7 @@
+project_id = "pbfyhtfusvpprzsagikq"
+[api]
+enabled = true
+port = 54321
+
+[functions.send-reminder-emails]
+verify_jwt = true

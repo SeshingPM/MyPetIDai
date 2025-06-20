@@ -1,0 +1,135 @@
+# windsurf.rules.yaml
+
+# 1. Project Structure
+structure:
+  pathAliases:
+    enforce: true
+    pattern: '^@/'
+    severity: error  # All imports must use "@/..." aliases
+  folderConventions:
+    - folder: components/ui
+      description: 'Reusable UI components'
+    - folder: components/layout
+      description: 'Layout components'
+    - folderPattern: components/{feature}/
+      description: 'Feature-specific components go in named folders'
+
+# 2. Component Standards
+components:
+  typeSafety:
+    requireExplicitReturnTypes: true
+    propsInterfaceRequired: true
+  functionalComponents:
+    enforceReactFC: true
+  naming:
+    filePattern: '^[A-Z][a-zA-Z0-9]*\.tsx$'  # PascalCase filenames
+    severity: error
+  props:
+    enforceDestructuring: true
+
+# 3. State Management
+state:
+  contextAPI:
+    requireHooksForAccess: true
+    separateContextFiles: true
+    providerWrappingEnforced: true
+  localState:
+    useUseState: true
+  complexState:
+    useUseReducer: true
+
+# 4. SEO Best Practices
+seo:
+  requireSeoComponent: true
+  uniqueMetadataPerPage: true
+  canonicalUrlsRequired: true
+  structuredDataEncouraged: true
+
+# 5. Styling Conventions
+styling:
+  tailwind:
+    enforceUtilityFirst: true
+  classnames:
+    requireCnHelper: true
+  responsive:
+    mobileFirstRequired: true
+  coLocatedStyles: true  # Styles stay in component file
+
+# 6. Hooks and Utils
+hooks:
+  directory: hooks/
+  namingConvention: '^use[A-Z]'  # Must start with "use"
+utils:
+  directory: utils/
+  pureFunctionsOnly: true
+  errorHandling:
+    requireLogger: true
+
+# 7. Performance Optimization
+performance:
+  lazyLoading:
+    requireReactLazy: true
+  memoization:
+    useMemoWhenNeeded: true
+    useCallbackWhenNeeded: true
+  resourceHints:
+    enforcePreconnect: true
+
+# 8. Authentication & Authorization
+auth:
+  useAuthHookRequired: true
+  protectedRoutesEnforced: true
+  roleBasedAccess:
+    requireAdminProp: true
+
+# 9. Error Handling & Logging
+errorHandling:
+  requireErrorBoundaries: true
+  loggerOnly: true  # Disallow console.log
+  userFeedback:
+    useToast: true
+
+# 10. TypeScript Best Practices
+typescript:
+  strictTypingEnforced: true
+  sharedTypesDirectory: types/
+  typeOnlyImports:
+    enforce: true
+
+# 11. Testing Guidelines
+testing:
+  requireComponentTests: true
+  hookTestsInIsolation: true
+  mockExternalServices: true
+  coverage:
+    statements: 80
+    branches: 70
+    severity: warning
+
+# 12. Code Documentation
+docs:
+  requireJSDoc: true
+  complexLogicMustBeCommented: true
+  todoFormatStandardized: true
+
+# 13. API & Data Fetching
+api:
+  useReactQuery: true
+  serviceLayerRequired: true
+  separateTransformationLayer: true
+
+# 14. Supabase Development
+supabase:
+  cli:
+    command: 'npx supabase'  # Always use npx supabase instead of supabase directly
+  migrations:
+    uniqueTimestamps: true   # Each migration file must have a unique timestamp
+    timeFormat: 'YYYYMMDDHHmmss'  # Format: year, month, day, hour, minute, second
+    filenamePattern: '^[0-9]{14}_[a-z0-9_]+\.sql$'  # timestamp_descriptive_name.sql
+  edgeFunctions:
+    deployCommand: 'npx supabase functions deploy'
+    testLocally: true  # Test edge functions locally before deploying
+  schemas:
+    documentInMigrations: true  # Document schema changes in migration comments
+
+# End of ruleset

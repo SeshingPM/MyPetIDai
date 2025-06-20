@@ -1,0 +1,55 @@
+/* iOS-specific optimizations and styling */
+
+/* Only apply these styles on iOS devices */
+@supports (-webkit-touch-callout: none) {
+  /* Larger touch targets for better usability on iOS */
+  .ios-touch-target {
+    min-height: 48px;
+    padding: 12px 16px;
+  }
+
+  /* Input height adjustments for iOS */
+  .ios-input-height {
+    height: 48px;
+  }
+
+  /* Fix for iOS safe areas and notches */
+  .ios-dialog {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left, 16px);
+    padding-right: env(safe-area-inset-right, 16px);
+    margin-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Fix iOS Safari button alignment issues */
+  button {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+  }
+
+  /* Fix dropdown menu positioning on iOS */
+  .mobile-dropdown-menu {
+    position: absolute !important;
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
+    min-width: 10rem !important;
+    z-index: 9999 !important;
+  }
+}
+
+/* Special styled toast for iOS download instructions */
+.ios-instruction-toast {
+  font-weight: bold !important;
+  font-size: 16px !important;
+  padding: 16px !important;
+  border-radius: 12px !important;
+  border-left: 4px solid #4f46e5 !important;
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  max-width: 390px !important;
+  margin: 0 auto !important;
+  z-index: 9999 !important;
+}

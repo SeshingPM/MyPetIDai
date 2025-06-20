@@ -1,0 +1,2 @@
+-- This is an empty seed file
+-- No data will be seeded when running supabase db reset

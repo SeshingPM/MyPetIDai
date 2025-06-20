@@ -1,0 +1,42 @@
+
+@layer components {
+  .glass-effect {
+    @apply bg-white/95 dark:bg-gray-900/95 border border-white/40 dark:border-gray-800/50 shadow-soft;
+  }
+  
+  .glass-card {
+    @apply rounded-2xl glass-effect transition-all duration-300;
+  }
+  
+  .glass-panel {
+    @apply glass-effect p-6 rounded-3xl;
+  }
+  
+  .btn-primary {
+    @apply bg-primary px-6 py-3 rounded-xl text-primary-foreground font-medium shadow-md hover:shadow-lg transition-all duration-300 hover:scale-[1.03] active:scale-[0.97];
+  }
+  
+  .btn-secondary {
+    @apply bg-secondary px-6 py-3 rounded-xl text-secondary-foreground font-medium transition-all duration-300 hover:bg-secondary/80 active:bg-secondary/90;
+  }
+  
+  .btn-outline {
+    @apply border-2 border-primary px-6 py-[10px] rounded-xl text-primary font-medium transition-all duration-300 hover:bg-primary/5 active:bg-primary/10;
+  }
+  
+  .btn-text {
+    @apply px-4 py-2 text-primary font-medium transition-all duration-300 hover:bg-primary/5 rounded-lg active:bg-primary/10;
+  }
+  
+  .container-max {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  
+  .container-tight {
+    @apply max-w-5xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  
+  .container-narrow {
+    @apply max-w-3xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+}

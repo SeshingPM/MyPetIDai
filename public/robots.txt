@@ -1,0 +1,65 @@
+# PetDocument robots.txt
+# Different directives for different environments
+
+# Production Environment (petdocument.com)
+User-agent: *
+Allow: /
+
+# Disallow admin and authenticated areas
+Disallow: /dashboard
+Disallow: /profile
+Disallow: /settings
+Disallow: /pets/*
+Disallow: /documents/private/*
+Disallow: /reminders/*
+Disallow: /health-check/*
+Disallow: /admin/*
+Disallow: /checkout
+
+# Allow all public pages (explicitly listed for clarity)
+Allow: /about
+Allow: /faq
+Allow: /contact
+Allow: /features
+Allow: /privacy
+Allow: /terms
+Allow: /pricing
+Allow: /login
+Allow: /register
+Allow: /documents/shared/*
+
+# Test Environment (test.petdocument.com)
+Host: test.petdocument.com
+User-agent: *
+Disallow: /
+
+# Development Environment (dev.petdocument.com, localhost)
+Host: dev.petdocument.com
+User-agent: *
+Disallow: /
+
+Host: localhost
+User-agent: *
+Disallow: /
+
+# Staging Environment (staging.petdocument.com)
+Host: staging.petdocument.com
+User-agent: *
+Disallow: /
+
+# Optimize crawl rate
+Crawl-delay: 5
+
+# Sitemap declarations
+Sitemap: https://petdocument.com/sitemap.xml
+
+# Additional crawler directives
+Request-rate: 1/10s
+Visit-time: 0600-2300
+
+# Block specific crawlers
+User-agent: BLEXBot
+Disallow: /
+
+User-agent: AhrefsBot
+Disallow: /

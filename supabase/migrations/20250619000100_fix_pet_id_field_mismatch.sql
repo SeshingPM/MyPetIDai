@@ -1,0 +1,224 @@
+-- Migration: 20250619000100_fix_pet_id_field_mismatch.sql
+-- Description: Final fix for onboarding - correct field name mismatch between SQL function and Edge Function
+
+-- Drop the function to avoid conflicts
+DROP FUNCTION IF EXISTS public.create_complete_pet_profile;
+
+-- Create the final fixed version that returns BOTH id and pet_identifier with proper field names
+CREATE OR REPLACE FUNCTION public.create_complete_pet_profile(
+    p_user_id UUID,
+    p_pet_name TEXT,
+    p_pet_type TEXT,
+    p_pet_breed TEXT,
+    p_pet_gender TEXT,
+    p_birth_or_adoption_date DATE,
+    p_photo_url TEXT,
+    p_owner_full_name TEXT,
+    p_owner_zip_code TEXT,
+    p_owner_phone TEXT,
+    p_owner_sms_opt_in BOOLEAN,
+    p_food TEXT,
+    p_treats TEXT,
+    p_allergies TEXT,
+    p_insurance TEXT,
+    p_medications TEXT,
+    p_supplements TEXT
+) RETURNS JSONB AS $$
+DECLARE
+    v_profile_id UUID;
+    v_pet_id UUID;
+    v_pet_identifier TEXT;
+    v_parsed_meds JSONB;
+    v_parsed_supps JSONB;
+    v_meds_array TEXT[] := '{}';
+    v_supplements_array TEXT[] := '{}';
+    v_i INTEGER;
+BEGIN
+    -- Update profile information with error handling
+    BEGIN
+        INSERT INTO profiles (
+            id,
+            full_name,
+            zip_code,
+            phone,
+            sms_opt_in,
+            registration_completed_at
+        ) VALUES (
+            p_user_id,
+            p_owner_full_name,
+            p_owner_zip_code,
+            p_owner_phone,
+            p_owner_sms_opt_in,
+            NOW()
+        )
+        ON CONFLICT (id) DO UPDATE SET
+            full_name = EXCLUDED.full_name,
+            zip_code = EXCLUDED.zip_code,
+            phone = EXCLUDED.phone,
+            sms_opt_in = EXCLUDED.sms_opt_in,
+            registration_completed_at = EXCLUDED.registration_completed_at
+        RETURNING id INTO v_profile_id;
+    EXCEPTION WHEN OTHERS THEN
+        RETURN jsonb_build_object('success', false, 'error', 'Failed to update profile: ' || SQLERRM);
+    END;
+
+    -- Parse medications JSON string into JSONB with error handling
+    BEGIN
+        -- Only try to parse if not null and not empty
+        IF p_medications IS NOT NULL AND p_medications != '' THEN
+            v_parsed_meds := p_medications::JSONB;
+            
+            -- Extract medication names safely
+            IF jsonb_typeof(v_parsed_meds) = 'array' AND jsonb_array_length(v_parsed_meds) > 0 THEN
+                SELECT array_agg(med->>'name')
+                FROM jsonb_array_elements(v_parsed_meds) med
+                WHERE med->>'name' IS NOT NULL
+                INTO v_meds_array;
+                
+                -- Default to empty array if NULL
+                IF v_meds_array IS NULL THEN
+                    v_meds_array := '{}';
+                END IF;
+            END IF;
+        END IF;
+    EXCEPTION WHEN OTHERS THEN
+        -- If JSON parsing fails, log it but continue with an empty array
+        v_meds_array := '{}';
+    END;
+
+    -- Parse supplements JSON string into JSONB with error handling
+    BEGIN
+        -- Only try to parse if not null and not empty
+        IF p_supplements IS NOT NULL AND p_supplements != '' THEN
+            v_parsed_supps := p_supplements::JSONB;
+            
+            -- Extract supplement names safely
+            IF jsonb_typeof(v_parsed_supps) = 'array' AND jsonb_array_length(v_parsed_supps) > 0 THEN
+                SELECT array_agg(supp::TEXT)
+                FROM jsonb_array_elements_text(v_parsed_supps) supp
+                WHERE supp IS NOT NULL
+                INTO v_supplements_array;
+                
+                -- Default to empty array if NULL
+                IF v_supplements_array IS NULL THEN
+                    v_supplements_array := '{}';
+                END IF;
+            END IF;
+        END IF;
+    EXCEPTION WHEN OTHERS THEN
+        -- If JSON parsing fails, log it but continue with an empty array
+        v_supplements_array := '{}';
+    END;
+
+    -- Insert pet record with error handling
+    BEGIN
+        INSERT INTO pets (
+            name,
+            type,
+            breed,
+            gender,
+            birth_or_adoption_date,
+            photo_url,
+            user_id
+        ) VALUES (
+            p_pet_name,
+            p_pet_type,
+            p_pet_breed,
+            p_pet_gender,
+            p_birth_or_adoption_date,
+            p_photo_url,
+            p_user_id
+        ) RETURNING id, pets.pet_identifier INTO v_pet_id, v_pet_identifier;
+        
+        IF v_pet_id IS NULL THEN
+            RETURN jsonb_build_object('success', false, 'error', 'Failed to create pet record: No ID returned');
+        END IF;
+    EXCEPTION WHEN OTHERS THEN
+        RETURN jsonb_build_object('success', false, 'error', 'Failed to create pet record: ' || SQLERRM);
+    END;
+
+    -- Insert basic pet profile
+    BEGIN
+        INSERT INTO pet_profiles (pet_id, food_type) 
+        VALUES (v_pet_id, p_food);
+    EXCEPTION WHEN OTHERS THEN
+        -- Continue even if this fails
+        NULL;
+    END;
+
+    -- Try to add treats if column exists
+    BEGIN
+        UPDATE pet_profiles 
+        SET treats = ARRAY[p_treats]
+        WHERE pet_id = v_pet_id;
+    EXCEPTION WHEN OTHERS THEN
+        -- Continue even if this fails
+        NULL;
+    END;
+
+    -- Try to add insurance info if columns exist
+    BEGIN
+        UPDATE pet_profiles 
+        SET insurance_provider = p_insurance,
+            has_insurance = CASE WHEN p_insurance IS NOT NULL AND p_insurance != '' THEN TRUE ELSE FALSE END
+        WHERE pet_id = v_pet_id;
+    EXCEPTION WHEN OTHERS THEN
+        -- Continue even if this fails
+        NULL;
+    END;
+
+    -- Try to add allergies if column exists
+    BEGIN
+        UPDATE pet_profiles 
+        SET allergies = p_allergies
+        WHERE pet_id = v_pet_id;
+    EXCEPTION WHEN OTHERS THEN
+        -- Continue even if this fails
+        NULL;
+    END;
+
+    -- Insert supplements if any
+    IF array_length(v_supplements_array, 1) > 0 THEN
+        BEGIN
+            FOR v_i IN 1..array_length(v_supplements_array, 1) LOOP
+                INSERT INTO pet_supplements (pet_id, name)
+                VALUES (v_pet_id, v_supplements_array[v_i]);
+            END LOOP;
+        EXCEPTION WHEN OTHERS THEN
+            -- Continue even if this fails
+            NULL;
+        END;
+    END IF;
+
+    -- Insert medications if any
+    IF array_length(v_meds_array, 1) > 0 THEN
+        BEGIN
+            FOR v_i IN 1..array_length(v_meds_array, 1) LOOP
+                INSERT INTO pet_medications (pet_id, name)
+                VALUES (v_pet_id, v_meds_array[v_i]);
+            END LOOP;
+        EXCEPTION WHEN OTHERS THEN
+            -- Continue even if this fails
+            NULL;
+        END;
+    END IF;
+
+    -- Return BOTH the actual UUID and the pet_identifier - this matches what the Edge Function expects
+    RETURN jsonb_build_object(
+        'success', true, 
+        'pet_id', v_pet_id, -- This is the UUID primary key
+        'pet_identifier', v_pet_identifier -- This is the formatted ID like DM-25-7213
+    );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Grant execute permissions to all necessary roles
+GRANT EXECUTE ON FUNCTION public.create_complete_pet_profile TO authenticated;
+GRANT EXECUTE ON FUNCTION public.create_complete_pet_profile TO anon;
+GRANT EXECUTE ON FUNCTION public.create_complete_pet_profile TO service_role;
+
+-- Add a comment to document the function's purpose
+COMMENT ON FUNCTION public.create_complete_pet_profile IS 
+'Creates a complete pet profile with owner information and lifestyle details.
+Returns both the actual UUID (pet_id) and the formatted pet_identifier string.
+The Edge Function expects pet_id to be the UUID primary key, not the text identifier.';

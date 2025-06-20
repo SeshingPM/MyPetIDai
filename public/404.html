@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Page Not Found - Redirecting...</title>
+  <link rel="canonical" href="https://petdocument.com/" />
+  <noscript>
+    <meta http-equiv="refresh" content="0;url=/">
+  </noscript>
+  <script>
+    // Client-side redirect handler for 404 pages
+    (function() {
+      // Check if the user agent is a bot
+      var userAgent = navigator.userAgent.toLowerCase();
+      var isBot = /bot|crawl|spider|google|bing|duckduckgo|yandex/.test(userAgent);
+      
+      // Only perform client-side redirects for human visitors, not for bots
+      if (!isBot) {
+        // More precise path checking
+        var p = location.pathname.toLowerCase();
+        var redirectUrl = '/';
+        
+        // Check for specific problematic paths
+        if (p.startsWith('/es/') ||
+            p.startsWith('/de/') ||
+            p.startsWith('/fr/') ||
+            p === '/download' ||
+            p.startsWith('/search')) {
+          redirectUrl = '/';
+        } else {
+          // Default redirect to homepage
+          redirectUrl = '/';
+        }
+        
+        // Perform the redirect
+        window.location.href = redirectUrl;
+      } else {
+        // For bots, we don't redirect - let them see the 404 status
+      }
+    })();
+  </script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #f8f9fa;
+      color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+    .container {
+      max-width: 600px;
+      padding: 40px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      color: #2c3e50;
+      margin-top: 0;
+    }
+    p {
+      font-size: 18px;
+      line-height: 1.6;
+    }
+    .loader {
+      display: inline-block;
+      width: 50px;
+      height: 50px;
+      border: 3px solid rgba(0, 0, 0, 0.1);
+      border-radius: 50%;
+      border-top-color: #007bff;
+      animation: spin 1s ease-in-out infinite;
+      margin: 20px 0;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Redirecting...</h1>
+    <div class="loader"></div>
+    <p>We're redirecting you to the correct page. If you're not redirected automatically, <a href="/">click here</a> to go to the homepage.</p>
+  </div>
+</body>
+</html>

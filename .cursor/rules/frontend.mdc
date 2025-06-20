@@ -1,0 +1,13 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+---
+Description: Frontend Coding Standards
+---
+
+#Frontend Guidelines
+- Components should be modular and reusable.
+- Maintain a consistent structure.
+- Use functional React components.
